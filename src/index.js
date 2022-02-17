@@ -4,6 +4,7 @@ const cors = require('cors');
 const swapi = require('./api/swapi');
 const { default: axios } = require('axios');
 const { client, connect: connectRedis } = require('./database/redis');
+const { validateCharacterNum } = require('./utils/validators');
 
 const app = express();
 const port = 3001;
@@ -13,16 +14,12 @@ app.use(cors({
 }));
 
 app.get("/api/character/:number", async (req, res) => {
-    const number = req.params.number;
-    if (Number.isNaN(number)) {
-        res.status(400).send({ message: `Should be a number the character "number"` });
-        return;
-    }
-    if (number < 1 && number > 10) {
-        res.status(422).send({ message: "The number should be between 1 to 10" });
-        return;
-    }
+    const { number } = req.params;
+    const validateInfo = validateCharacterNum(number);
 
+    if (!validateInfo.isValid) {
+        res.status(validateInfo.status).send({ ...validateInfo.message });
+    }
     try {
         let formattedPersona = {}
         if (await client.exists(number)) {
