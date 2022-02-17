@@ -4,7 +4,7 @@ const cors = require('cors');
 const swapi = require('./api/swapi');
 const { default: axios } = require('axios');
 const { client, connect: connectRedis } = require('./database/redis');
-const { validateCharacterNum } = require('./utils/validators');
+const { validateCharacterNumber } = require('./utils/validators');
 
 const app = express();
 const port = 3001;
@@ -15,11 +15,13 @@ app.use(cors({
 
 app.get("/api/character/:number", async (req, res) => {
     const { number } = req.params;
-    const validateInfo = validateCharacterNum(number);
+    const validatedNumber = validateCharacterNumber(number);
 
-    if (!validateInfo.isValid) {
-        res.status(validateInfo.status).send({ ...validateInfo.message });
+    if (!validatedNumber.isValid) {
+        res.status(validatedNumber.status).send({ message: validatedNumber.message });
+        return;
     }
+    
     try {
         let formattedPersona = {}
         if (await client.exists(number)) {
@@ -37,7 +39,7 @@ app.get("/api/character/:number", async (req, res) => {
         };
 
         await client.set(number, JSON.stringify(formattedPersona));
-        client.expire(number, 10);
+        client.expire(number, 10000);
         res.status(200).send(formattedPersona);
     } catch (error) {
         console.log(error);

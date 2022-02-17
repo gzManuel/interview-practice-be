@@ -1,4 +1,4 @@
-const validateCharacterNum = (number) => {
+const validateCharacterNumber = (number) => {
     let data = {
         isValid: true,
         status: 200,
@@ -24,5 +24,5 @@ const validateCharacterNum = (number) => {
 }
 
 module.exports = {
-    validateCharacterNum
+    validateCharacterNumber
 }
