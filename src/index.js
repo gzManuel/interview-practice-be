@@ -18,27 +18,29 @@ app.get("/api/character/:number", async (req, res) => {
         res.status(400).send({ message: `Should be a number the character "number"` });
         return;
     }
-    if (number > 0 && number < 11) {
+    if (number < 1 && number > 10) {
         res.status(422).send({ message: "The number should be between 1 to 10" });
         return;
     }
 
     try {
+        let formattedPersona = {}
         if (await client.exists(number)) {
-            const formattedPersona = JSON.parse(await client.get(number));
+            formattedPersona = JSON.parse(await client.get(number));
             res.status(200).send(formattedPersona);
             return;
         }
 
         const people = await swapi.getPeopleByNumber(number);
         const homeworld = (await axios.get(people.homeworld)).data;
-        const formattedPersona = {
+        formattedPersona = {
             name: people.name,
             birth_year: people.birth_year,
             homeworld: homeworld.name
         };
 
-        client.set(number, JSON.stringify(formattedPersona));
+        await client.set(number, JSON.stringify(formattedPersona));
+        client.expire(number, 10);
         res.status(200).send(formattedPersona);
     } catch (error) {
         console.log(error);
