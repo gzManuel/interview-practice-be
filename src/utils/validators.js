@@ -1,18 +1,24 @@
 const validateCharacterNum = (number) => {
-    const data = {
+    let data = {
         isValid: true,
         status: 200,
         message: "Success"
     }
-    if (Number.isNaN(number)) {
-        data.isValid = false;
-        data.status = 400;
-        data.message = "Character number should be a number"
+    if (isNaN(number)) {
+        data = {
+            isValid: false,
+            status: 400,
+            message: "Character number should be a number"
+        }
+        return data;
     }
-    if (number < 1 && number > 10) {
-        data.isValid = false;
-        data.status = 422;
-        data.message = "Character number should be between 1-10"
+    if (number < 1 || number > 10) {
+        data = {
+            isValid: false,
+            status: 422,
+            message: "Character number should be between 1-10"
+        }
+        return data;
     }
     return data;
 }
