@@ -3,12 +3,11 @@ const cors = require('cors');
 
 const swapi = require('./api/swapi');
 const { default: axios } = require('axios');
-const { client, connect } = require('./database/redis');
+const { client, connect: connectRedis } = require('./database/redis');
 
 const app = express();
 const port = 3001;
 
-connect();
 app.use(cors({
     origin: "*"
 }));
@@ -16,7 +15,7 @@ app.use(cors({
 app.get("/api/character/:number", async (req, res) => {
     const number = req.params.number;
     try {
-        
+
         if (await client.exists(number)) {
             const formattedPersona = JSON.parse(await client.get(number));
             res.status(200).send(formattedPersona);
@@ -38,6 +37,8 @@ app.get("/api/character/:number", async (req, res) => {
     }
 });
 
-app.listen(port, () => {
-    console.log(`Swapi server port${port}`)
+connectRedis().then(() => {
+    app.listen(port, () => {
+        console.log(`Swapi server port${port}`)
+    });
 });
