@@ -1,10 +1,10 @@
 const express = require('express');
 const cors = require('cors');
+const { default: axios } = require('axios');
 
 const swapi = require('./api/swapi');
-const { default: axios } = require('axios');
 const { client, connect: connectRedis } = require('./database/redis');
-const { validateCharacterNumber } = require('./utils/validators');
+const { validateCharacterNumber } = require('./middlewares/validate-path')
 
 const app = express();
 const port = 3001;
@@ -13,17 +13,13 @@ app.use(cors({
     origin: "*"
 }));
 
+app.get("/api/character/:number",validateCharacterNumber);
 app.get("/api/character/:number", async (req, res) => {
     const { number } = req.params;
-    const validatedNumber = validateCharacterNumber(number);
 
-    if (!validatedNumber.isValid) {
-        res.status(validatedNumber.status).send({ message: validatedNumber.message });
-        return;
-    }
-    
     try {
         let formattedPersona = {}
+
         if (await client.exists(number)) {
             formattedPersona = JSON.parse(await client.get(number));
             res.status(200).send(formattedPersona);
@@ -31,6 +27,7 @@ app.get("/api/character/:number", async (req, res) => {
         }
 
         const people = await swapi.getPeopleByNumber(number);
+
         const homeworld = (await axios.get(people.homeworld)).data;
         formattedPersona = {
             name: people.name,
