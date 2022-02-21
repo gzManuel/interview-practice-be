@@ -45,12 +45,12 @@ describe('GET /api/character/:number', function () {
         });
     });
     describe(':number is a number between 1 to 10', function () {
-        it('should return a 200 status', function (done) {
+        it('should return a 200 status with an object', function (done) {
             chai.request(server)
                 .get('/api/character/1')
                 .end((err, res) => {
-                    console.log(res.status);
                     res.should.have.status(200);
+                    res.body.should.be.a('object')
                     done();
                 });
         });
