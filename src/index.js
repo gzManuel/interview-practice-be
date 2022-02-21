@@ -13,7 +13,7 @@ app.use(cors({
     origin: "*"
 }));
 
-app.get("/api/character/:number",validateCharacterNumber);
+app.use("/api/character/:number", validateCharacterNumber);
 app.get("/api/character/:number", async (req, res) => {
     const { number } = req.params;
 
