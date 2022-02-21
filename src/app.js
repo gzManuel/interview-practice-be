@@ -22,7 +22,7 @@ app.get("/api/character/:number", async (req, res) => {
 
         if (await client.exists(number)) {
             formattedPersona = JSON.parse(await client.get(number));
-            console.log(await schemaCharacter.validateAsync({}));
+            await schemaCharacter.validateAsync(formattedPersona);
             res.status(200).send(formattedPersona);
             return;
         }
@@ -36,7 +36,7 @@ app.get("/api/character/:number", async (req, res) => {
             homeworld: homeworld.name
         };
 
-        console.log(schemaCharacter.valid({}));
+        await schemaCharacter.validateAsync(formattedPersona);
 
         await client.set(number, JSON.stringify(formattedPersona));
         client.expire(number, 10000);
