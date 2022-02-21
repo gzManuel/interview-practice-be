@@ -13,13 +13,11 @@ app.use(cors({
     origin: "*"
 }));
 
-app.use("/api/character/:number", validateCharacterNumber);
-app.get("/api/character/:number", async (req, res) => {
+app.get("/api/character/:number", validateCharacterNumber, async (req, res) => {
     const { number } = req.params;
 
     try {
-        let formattedPersona = {}
-
+        let formattedPersona
         if (await client.exists(number)) {
             formattedPersona = JSON.parse(await client.get(number));
             await schemaCharacter.validateAsync(formattedPersona);
