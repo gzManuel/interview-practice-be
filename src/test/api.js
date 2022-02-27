@@ -2,7 +2,6 @@ let chai = require('chai');
 let chaiHttp = require('chai-http')
 let server = require('../app');
 let { connect: connectRedis, disconnect: disconnectRedis } = require('../database/redis');
-let should = chai.should();
 const expect = chai.expect
 
 
@@ -26,6 +25,7 @@ describe('GET /api/character/:number', function () {
                 .get(`/api/character/${myString}`)
                 .end((err, res) => {
                     res.should.have.status(400);
+                    expect(res.status).to.equal(400);
                     done();
                 });
         });
@@ -33,7 +33,7 @@ describe('GET /api/character/:number', function () {
             chai.request(server)
                 .get('/api/character/0')
                 .end((err, res) => {
-                    res.should.have.status(400);
+                    expect(res.status).to.equal(400);
                     done();
                 });
         });
@@ -53,8 +53,8 @@ describe('GET /api/character/:number', function () {
             chai.request(server)
                 .get('/api/character/1')
                 .end((err, res) => {
-                    res.should.have.status(200);
-                    res.body.should.be.a('object')
+                    expect(res.status).to.equal(200);
+                    expect(res.body).to.be.an('object');
                     done();
                 });
         });
